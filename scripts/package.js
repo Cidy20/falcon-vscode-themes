@@ -81,19 +81,21 @@ function findNpmCli() {
   return candidates.find(p => fs.existsSync(p));
 }
 
-// ── Step 3: 构建主题（YAML -> JSON） ────────────────────────
-step(3, 4, '构建主题 JSON');
-run(process.execPath, [path.join(ROOT, 'scripts', 'build.js')]);
-
-// ── Step 4: 打包 VSIX ───────────────────────────────────────
-step(4, 4, '打包 VSIX');
-// 直接调 vsce 的 CLI 入口，不走 node_modules/.bin/vsce (那是 shim)
-const vsceCli = path.join(ROOT, 'node_modules', 'vsce', 'out', 'main.js');
-if (!fs.existsSync(vsceCli)) {
-  console.error(`✗ vsce CLI 不存在: ${vsceCli}`);
+// ── Step 3: 打包 VSIX（vsce 会自动触发 prepublish → npm run build）─
+step(3, 3, '构建 + 打包 VSIX');
+// 必须走 .cmd shim：node 直接调 vsce/out/main.js 在 Windows 下会静默退出
+// vsce.cmd 自带 prepublish 钩子，自动先跑 build 再打包
+const vsceCmd = path.join(ROOT, 'node_modules', '.bin', 'vsce.cmd');
+if (!fs.existsSync(vsceCmd)) {
+  console.error(`✗ vsce.cmd 不存在: ${vsceCmd}`);
   process.exit(1);
 }
-run(process.execPath, [vsceCli, 'package', '-o', OUTPUT]);
+// 删旧文件，避免 vsce 拒绝覆盖导致的静默问题
+if (fs.existsSync(OUTPUT)) {
+  log('info', '删除旧 VSIX 避免覆盖冲突…');
+  fs.unlinkSync(OUTPUT);
+}
+run(vsceCmd, ['package', '-o', OUTPUT]);
 
 // ── 验证产物 ────────────────────────────────────────────────
 console.log('\n━━━ 验证产物 ━━━');

@@ -120,10 +120,11 @@ colors:
   inputValidation.errorBorder      : *RED # Input validation border color for error severity
 
   # Scroll Bar Control
-  scrollbar.shadow                : # Scroll Bar shadow to indicate that the view is scrolled
-  scrollbarSlider.activeBackground: *SELECTION # Slider background color when active
-  scrollbarSlider.background      : *BORDER # Slider background color
-  scrollbarSlider.hoverBackground : *SELECTION # Slider background color when hovering
+  scrollbar.shadow                : #
+  scrollbarSlider.border          : '#d8e0e3'  # track (new)
+  scrollbarSlider.background      : '#918cab'  # thumb (was *BORDER)
+  scrollbarSlider.hoverBackground : '#a5a4bc'  # hover (was *SELECTION)
+  scrollbarSlider.activeBackground: *SELECTION  # active (unchanged)
 
   # Badge
   badge.foreground: *WHITE # Badge foreground color
